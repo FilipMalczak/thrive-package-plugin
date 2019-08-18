@@ -1,0 +1,40 @@
+buildscript {
+    repositories {
+        maven {
+            name "jitpack"
+            url "https://jitpack.io"
+        }
+    }
+    dependencies {
+        classpath "com.github.thrive-framework:thrive-versioning-plugin:0.2.0-SNAPSHOT"
+    }
+}
+
+plugins {
+    id 'maven-publish'
+    id 'groovy'
+    id 'java-library'
+    id 'java-gradle-plugin'
+}
+
+apply plugin: "com.github.thrive-versioning"
+
+group = 'com.github.thrive-framework'
+
+repositories {
+    mavenCentral()
+    gradlePluginPortal()
+}
+
+gradlePlugin {
+    plugins {
+        simplePlugin {
+            id = 'com.github.thrive-package'
+            implementationClass = 'com.github.thriveframework.plugin.ThrivePackagePlugin'
+        }
+    }
+}
+wrapper {
+    distributionType = Wrapper.DistributionType.ALL
+    gradleVersion = '5.2.1'
+}
