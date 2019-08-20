@@ -17,6 +17,13 @@ plugins {
     id 'java-gradle-plugin'
 }
 
+sourceSets.main.java.srcDirs = []
+sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
+
+ext {
+    lombokVersion = "1.18.2"
+}
+
 apply plugin: "com.github.thrive-versioning"
 
 group = 'com.github.thrive-framework'
@@ -24,6 +31,12 @@ group = 'com.github.thrive-framework'
 repositories {
     mavenCentral()
     gradlePluginPortal()
+}
+
+dependencies {
+    implementation 'org.yaml:snakeyaml:1.25'
+    compileOnly("org.projectlombok:lombok:${lombokVersion}")
+    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
 }
 
 gradlePlugin {
