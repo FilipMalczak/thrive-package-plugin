@@ -7,9 +7,12 @@ import com.github.thriveframework.plugin.task.PackageJar
 import com.github.thriveframework.plugin.task.WritePackage
 import com.github.thriveframework.plugin.task.WritePackageProviderConfiguration
 import com.github.thriveframework.plugin.utils.PackageFiles
+
 import groovy.util.logging.Slf4j
+import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.util.GradleVersion
 
 @Slf4j
 class ThrivePackagePlugin implements Plugin<Project> {
@@ -19,13 +22,22 @@ class ThrivePackagePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project target) {
+        //todo another "common" candidate
+        verifyGradleVersion()
         prepare(target)
         addWritePackageTask(target)
         addCompilePackageTask(target)
         addWritePackageServiceProviderDescriptorTask(target)
         addPackageJarTask(target)
         bindTasks(target)
-//        addArtifact(target)
+        addArtifact(target)
+    }
+
+    private void verifyGradleVersion() {
+        if (GradleVersion.current().compareTo(GradleVersion.version("5.5")) < 0) {
+            throw new GradleException("Thrive plugin requires Gradle 5.5 or later. The current version is "
+                + GradleVersion.current());
+        }
     }
 
     private void prepare(Project project){
@@ -43,6 +55,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
 
         project.dependencies {
             //fixme jitpack repo may be missing!; besides, it now requires Yaml that is on central
+            //require currently used version - how do I do that?
             thrivePackage "com.github.thrive-framework:thrive-package-plugin:0.1.0-SNAPSHOT"
         }
     }
@@ -57,9 +70,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         ) {
             packageGroup = extension.group
             packageName = extension.name
-            composition = extension.name.map({n ->
-                Composition.of(new Service("xyz", null, null, null, null, null))
-            })
+            composition = project.provider { extension.composition }
             targetDir = packageFiles.packageSrc
         }
     }
@@ -68,7 +79,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         def pf = packageFiles
         project.tasks.create(
             name: "compilePackage",
-            type: CompilePackage, //todo rename build->compile
+            type: CompilePackage,
             group: taskGroup,
             description: "", //todo
             constructorArgs: [project.tasks.writePackage, project.configurations.thrivePackage]
@@ -87,9 +98,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         ) {
             packageGroup = extension.group
             packageName = extension.name
-            composition = extension.name.map({n ->
-                Composition.of(new Service("xyz", null, null, null, null, null))
-            })
+            composition = project.provider { extension.composition }
             targetDir = packageFiles.packageResources
         }
     }
@@ -114,5 +123,12 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.clean.doLast {
             packageFiles.root.deleteDir()
         }
+    }
+
+    private void addArtifact(Project project){
+        //todo
+//        project.artfacts {
+//
+//        }
     }
 }

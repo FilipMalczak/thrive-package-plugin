@@ -1,5 +1,6 @@
 package com.github.thriveframework.plugin;
 
+import com.github.thriveframework.plugin.model.Composition;
 import lombok.Data;
 import org.yaml.snakeyaml.Yaml;
 

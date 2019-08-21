@@ -4,10 +4,10 @@ import lombok.Value;
 
 @Value(staticConstructor = "between")
 public class Port {
-    int internal;
     int external;
+    int internal;
 
-    public static Port between(int justExposed){
+    public static Port exposed(int justExposed){
         return between(justExposed, justExposed);
     }
 }

@@ -1,7 +1,7 @@
 package com.github.thriveframework.plugin.task
 
 import com.github.thriveframework.plugin.AbstractPluginPackage
-import Composition
+import com.github.thriveframework.plugin.model.Composition
 import com.github.thriveframework.plugin.utils.Echo
 import groovy.util.logging.Slf4j
 import org.gradle.api.file.DirectoryProperty
@@ -30,11 +30,6 @@ class WritePackage extends Echo {
         targetDir = objects.directoryProperty()
         super.content.set(prepareSource())
         super.target.set(providers.provider({
-            log.info "XXX"
-            log.info "n $packageName"
-            log.info "g $packageGroup"
-            log.info "c $composition"
-            log.info "t $targetDir"
             targetDir.get().file(
                 packageGroup.get().replace(".", "/") +
                     "/" +
@@ -45,11 +40,6 @@ class WritePackage extends Echo {
 
     private Provider<String> prepareSource(){
         composition.map({ Composition c ->
-            log.info "YYY"
-            log.info "n $packageName"
-            log.info "g $packageGroup"
-            log.info "c $composition"
-            log.info "t $targetDir"
             def yaml = new Yaml().dump(c)
             def escaped = yaml.replace("\"", "\\\"").replace("\n", "\\n")
             """

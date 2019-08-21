@@ -1,18 +1,22 @@
 package com.github.thriveframework.plugin.model;
 
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.Value;
+import lombok.experimental.FieldDefaults;
 
+import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
 
-@Value(staticConstructor = "of")
+@Data
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@AllArgsConstructor
 public class Composition {
-    List<Service> services;
+    List<Service> services = new LinkedList<>();
     //todo introduce facets
-//    Map<String, List<Service>> facets
-
-    public static Composition of(Service... services){
-        return of(asList(services));
-    }
+//    Map<String, List<ServiceExtension>> facets
 }
