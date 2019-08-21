@@ -41,7 +41,7 @@ dependencies {
 
 gradlePlugin {
     plugins {
-        simplePlugin {
+        thrivePackagePlugin {
             id = 'com.github.thrive-package'
             implementationClass = 'com.github.thriveframework.plugin.ThrivePackagePlugin'
         }

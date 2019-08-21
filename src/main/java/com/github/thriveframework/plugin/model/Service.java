@@ -1,25 +1,21 @@
 package com.github.thriveframework.plugin.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.*;
-import java.util.stream.Stream;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
 public class Service {
-    String name;
+    @NonNull String name;
     String image;
-    Map<String, String> environment = new HashMap<>();
-    Set<Port> ports = new HashSet<>();
-    Set<String> startupDependencies = new HashSet<>();
-    Set<String> runtimeDependencies = new HashSet<>();
+    @NonNull Map<String, String> environment = new HashMap<>();
+    @NonNull Set<Port> ports = new HashSet<>();
+    @NonNull Set<String> startupDependencies = new HashSet<>();
+    @NonNull Set<String> runtimeDependencies = new HashSet<>();
 
     //required so that Gradle can create named domain objects (see ThrivePackageExtension)
     Service(String name){
@@ -43,5 +39,16 @@ public class Service {
 
     //todo fluent, type-agnostic ports(Object... p)
 
-    //todo fluent API
+    //todo maybe something shorter? startup=require, runtime=use?
+    void startupDependency(String dep){
+        startupDependencies.add(dep);
+    }
+
+    void runtimeDependency(String dep){
+        runtimeDependencies.add(dep);
+    }
+
+    void env(Map<String, String> val){
+        environment.putAll(val);
+    }
 }
