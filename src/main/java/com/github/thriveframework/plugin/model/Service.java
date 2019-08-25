@@ -9,13 +9,18 @@ import java.util.*;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Service {
-    @NonNull String name;
+    String name;
     String image;
-    @NonNull Map<String, String> environment = new HashMap<>();
-    @NonNull Set<Port> ports = new HashSet<>();
-    @NonNull Set<String> startupDependencies = new HashSet<>();
-    @NonNull Set<String> runtimeDependencies = new HashSet<>();
+    @Singular("env")
+    Map<String, String> environment;
+    @Singular
+    Set<Port> ports;
+    @Singular("startupDependency")
+    Set<String> startupDependencies;
+    @Singular("runtimeDependency")
+    Set<String> runtimeDependencies;
 
     //required so that Gradle can create named domain objects (see ThrivePackageExtension)
     Service(String name){

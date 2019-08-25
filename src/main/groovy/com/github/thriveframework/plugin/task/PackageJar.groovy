@@ -7,11 +7,11 @@ import javax.inject.Inject
 
 class PackageJar extends Jar {
     @Inject
-    PackageJar(PackageFiles packageFiles){
+    PackageJar(String projectName, PackageFiles packageFiles){
         from(packageFiles.packageClasses, packageFiles.packageResources)
         destinationDirectory.set packageFiles.packageLibs
         include "**/*.class"
         include "META-INF/services/*"
-        archiveClassifier.set "package"
+        archiveBaseName.set "${projectName}-package"
     }
 }

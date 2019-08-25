@@ -12,13 +12,27 @@ import groovy.util.logging.Slf4j
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.component.AdhocComponentWithVariants
+import org.gradle.api.component.SoftwareComponentFactory
+import org.gradle.api.plugins.internal.JavaConfigurationVariantMapping
+import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.util.GradleVersion
+
+import javax.inject.Inject
+
+import static com.github.thriveframework.plugin.utils.Projects.fullName
 
 @Slf4j
 class ThrivePackagePlugin implements Plugin<Project> {
     private PackageFiles packageFiles
     private ThrivePackageExtension extension
     private final static String taskGroup = "thrive (package)"
+    private SoftwareComponentFactory componentFactory
+
+    @Inject
+    ThrivePackagePlugin(SoftwareComponentFactory componentFactory) {
+        this.componentFactory = componentFactory
+    }
 
     @Override
     void apply(Project target) {
@@ -30,13 +44,31 @@ class ThrivePackagePlugin implements Plugin<Project> {
         addWritePackageServiceProviderDescriptorTask(target)
         addPackageJarTask(target)
         bindTasks(target)
-        addArtifact(target)
+        configurePublishing(target)
+        logAvailablePackages()
     }
 
     private void verifyGradleVersion() {
         if (GradleVersion.current().compareTo(GradleVersion.version("5.5")) < 0) {
             throw new GradleException("Thrive plugin requires Gradle 5.5 or later. The current version is "
                 + GradleVersion.current());
+        }
+    }
+
+    private void applyPluginIfNeeded(Project project, plugin){
+        String nameToLog;
+        if (plugin instanceof Class)
+            nameToLog = plugin.canonicalName
+        else if (plugin instanceof String)
+            nameToLog = plugin
+        else
+            log.warn("$plugin is neither a class nor String, but rather ${plugin.class}; prepare for possible trouble")
+        log.info("Trying to apply plugin with implementation $nameToLog to project ${fullName(project)}")
+        if (!project.plugins.findPlugin(plugin)) {
+            log.info("Applying $nameToLog")
+            project.apply plugin: plugin
+        } else {
+            log.info("$nameToLog already applied")
         }
     }
 
@@ -58,6 +90,10 @@ class ThrivePackagePlugin implements Plugin<Project> {
             //require currently used version - how do I do that?
             thrivePackage "com.github.thrive-framework:thrive-package-plugin:0.1.0-SNAPSHOT"
         }
+
+        AdhocComponentWithVariants component = componentFactory.adhoc("thrive")
+        component.addVariantsFromConfiguration(project.configurations.thrivePackage, new JavaConfigurationVariantMapping("compile", false))
+        project.components.add(component)
     }
 
     private void addWritePackageTask(Project project){
@@ -109,7 +145,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
             type: PackageJar,
             group: taskGroup,
             description: "",//todo
-            constructorArgs: [packageFiles]
+            constructorArgs: [project.name, packageFiles]
         )
     }
 
@@ -118,6 +154,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.packageJar.dependsOn project.compilePackage
         project.packageJar.dependsOn project.writePackageServiceProviderDescriptor
 
+        //todo build may not be available!
         project.build.dependsOn project.packageJar
 
         project.clean.doLast {
@@ -125,10 +162,20 @@ class ThrivePackagePlugin implements Plugin<Project> {
         }
     }
 
-    private void addArtifact(Project project){
-        //todo
-//        project.artfacts {
-//
-//        }
+    private void configurePublishing(Project project){
+        applyPluginIfNeeded(project, "maven-publish")
+        project.publishing.publications.create("thrivePackage", MavenPublication){
+            artifactId = "${project.name}-package"
+            from project.components.thrive
+            artifact project.packageJar
+        }
+        project.publishThrivePackagePublicationToMavenLocal.dependsOn project.packageJar
+    }
+
+    private void logAvailablePackages(){
+        ServiceLoader<Package> packages = ServiceLoader.load(Package)
+        packages.each {
+            println "${it.name}, ${it.class}"
+        }
     }
 }

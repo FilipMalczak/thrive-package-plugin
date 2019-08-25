@@ -2,13 +2,14 @@ package com.github.thriveframework.plugin.task
 
 import com.github.thriveframework.plugin.AbstractPluginPackage
 import com.github.thriveframework.plugin.model.Composition
-import com.github.thriveframework.plugin.utils.Echo
 import groovy.util.logging.Slf4j
+import org.gradle.api.Task
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
+import org.gradle.api.specs.Spec
 import org.yaml.snakeyaml.Yaml
 
 import javax.inject.Inject
@@ -30,11 +31,19 @@ class WritePackage extends Echo {
         targetDir = objects.directoryProperty()
         super.content.set(prepareSource())
         super.target.set(providers.provider({
-            targetDir.get().file(
-                packageGroup.get().replace(".", "/") +
-                    "/" +
-                    packageName.get() +
-                    ".java")
+            log.info("WRITE PACKAGE PROVIDER")
+            log.info("TARGET DIR ${targetDir.get().asFile.absolutePath}")
+            def result = targetDir.get().file(
+                "./" +
+                    (
+                        packageGroup.get().replace(".", "/") +
+                            "/" +
+                            packageName.get() +
+                            ".java"
+                    )
+            )
+            log.info("Result $result.asFile.absolutePath")
+            result
         }))
     }
 

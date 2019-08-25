@@ -1,9 +1,6 @@
 package com.github.thriveframework.plugin.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.Value;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.util.Collections;
@@ -15,6 +12,7 @@ import static java.util.Arrays.asList;
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor
+@NoArgsConstructor
 public class Composition {
     List<Service> services = new LinkedList<>();
     //todo introduce facets

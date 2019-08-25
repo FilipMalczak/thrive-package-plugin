@@ -2,7 +2,6 @@ package com.github.thriveframework.plugin.task
 
 import com.github.thriveframework.plugin.Package
 import com.github.thriveframework.plugin.model.Composition
-import com.github.thriveframework.plugin.utils.Echo
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
