@@ -14,6 +14,7 @@ import org.yaml.snakeyaml.Yaml
 
 import javax.inject.Inject
 
+//todo caching - annotation on class, @input, @output
 @Slf4j
 class WritePackage extends Echo {
     //todo assert that it's a valid package name
@@ -31,8 +32,6 @@ class WritePackage extends Echo {
         targetDir = objects.directoryProperty()
         super.content.set(prepareSource())
         super.target.set(providers.provider({
-            log.info("WRITE PACKAGE PROVIDER")
-            log.info("TARGET DIR ${targetDir.get().asFile.absolutePath}")
             def result = targetDir.get().file(
                 "./" +
                     (
@@ -42,7 +41,6 @@ class WritePackage extends Echo {
                             ".java"
                     )
             )
-            log.info("Result $result.asFile.absolutePath")
             result
         }))
     }

@@ -8,7 +8,6 @@ import static lombok.AccessLevel.PRIVATE;
 @Data
 @AllArgsConstructor(access = PRIVATE)
 @NoArgsConstructor(access = PRIVATE)
-@Setter(PRIVATE)
 @FieldDefaults(level = PRIVATE)
 public class Port {
     int external;

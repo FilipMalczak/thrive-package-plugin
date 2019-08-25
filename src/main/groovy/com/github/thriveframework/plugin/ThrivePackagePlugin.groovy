@@ -4,8 +4,10 @@ package com.github.thriveframework.plugin
 import com.github.thriveframework.plugin.extension.ThrivePackageExtension
 import com.github.thriveframework.plugin.task.CompilePackage
 import com.github.thriveframework.plugin.task.PackageJar
+import com.github.thriveframework.plugin.task.WriteDockerCompose
 import com.github.thriveframework.plugin.task.WritePackage
 import com.github.thriveframework.plugin.task.WritePackageProviderConfiguration
+import com.github.thriveframework.plugin.utils.Gradle
 import com.github.thriveframework.plugin.utils.PackageFiles
 
 import groovy.util.logging.Slf4j
@@ -20,6 +22,8 @@ import org.gradle.util.GradleVersion
 
 import javax.inject.Inject
 
+import static com.github.thriveframework.plugin.utils.Projects.applyPlugin
+import static com.github.thriveframework.plugin.utils.Projects.createTask
 import static com.github.thriveframework.plugin.utils.Projects.fullName
 
 @Slf4j
@@ -37,7 +41,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
     @Override
     void apply(Project target) {
         //todo another "common" candidate
-        verifyGradleVersion()
+        Gradle.assertVersionAtLeast("5.5")
         prepare(target)
         addWritePackageTask(target)
         addCompilePackageTask(target)
@@ -45,31 +49,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         addPackageJarTask(target)
         bindTasks(target)
         configurePublishing(target)
-        logAvailablePackages()
-    }
-
-    private void verifyGradleVersion() {
-        if (GradleVersion.current().compareTo(GradleVersion.version("5.5")) < 0) {
-            throw new GradleException("Thrive plugin requires Gradle 5.5 or later. The current version is "
-                + GradleVersion.current());
-        }
-    }
-
-    private void applyPluginIfNeeded(Project project, plugin){
-        String nameToLog;
-        if (plugin instanceof Class)
-            nameToLog = plugin.canonicalName
-        else if (plugin instanceof String)
-            nameToLog = plugin
-        else
-            log.warn("$plugin is neither a class nor String, but rather ${plugin.class}; prepare for possible trouble")
-        log.info("Trying to apply plugin with implementation $nameToLog to project ${fullName(project)}")
-        if (!project.plugins.findPlugin(plugin)) {
-            log.info("Applying $nameToLog")
-            project.apply plugin: plugin
-        } else {
-            log.info("$nameToLog already applied")
-        }
+        addComposeTask(target)
     }
 
     private void prepare(Project project){
@@ -162,7 +142,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
     }
 
     private void configurePublishing(Project project){
-        applyPluginIfNeeded(project, "maven-publish")
+        applyPlugin(project, "maven-publish")
         project.publishing.publications.create("thrivePackage", MavenPublication){
             artifactId = "${project.name}-package"
             from project.components.thrive
@@ -171,10 +151,25 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.publishThrivePackagePublicationToMavenLocal.dependsOn project.packageJar
     }
 
-    private void logAvailablePackages(){
-        ServiceLoader<Package> packages = ServiceLoader.load(Package)
-        packages.each {
-            println "${it.name}, ${it.class}"
+    private void addComposeTask(Project project){
+        createTask(
+            project,
+            "writeDockerCompose",
+            WriteDockerCompose,
+            "thrive (docker)",
+            "", //todo
+            [project]
+        ) {
+            def p = []
+            p.addAll(ServiceLoader.load(Package))
+            packages = p
+            def sProvider = {
+                def s = []
+                s.addAll(extension.services)
+                s
+            }
+            declaredServices.set(project.provider(sProvider))
+            targetDir = project.projectDir
         }
     }
 }
