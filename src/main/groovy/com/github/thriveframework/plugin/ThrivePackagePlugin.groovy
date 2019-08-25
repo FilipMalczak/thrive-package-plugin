@@ -154,10 +154,9 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.packageJar.dependsOn project.compilePackage
         project.packageJar.dependsOn project.writePackageServiceProviderDescriptor
 
-        //todo build may not be available!
-        project.build.dependsOn project.packageJar
+        project.tasks.findByName("build")?.dependsOn project.packageJar
 
-        project.clean.doLast {
+        project.tasks.findByName("clean")?.doLast {
             packageFiles.root.deleteDir()
         }
     }
