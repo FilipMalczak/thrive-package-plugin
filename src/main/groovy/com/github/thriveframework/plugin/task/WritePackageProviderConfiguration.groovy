@@ -1,6 +1,6 @@
 package com.github.thriveframework.plugin.task
 
-import com.github.thriveframework.plugin.Package
+import com.github.thriveframework.plugin.ThrivePackage
 import com.github.thriveframework.plugin.model.Composition
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
@@ -22,6 +22,6 @@ class WritePackageProviderConfiguration extends Echo {
         composition = objects.property(Composition)
         targetDir = objects.directoryProperty()
         super.content.set(packageName.map({n -> packageGroup.get()+"."+n}));
-        super.target.set(targetDir.map({d -> d.file("META-INF/services/${Package.canonicalName}")}))
+        super.target.set(targetDir.map({d -> d.file("META-INF/services/${ThrivePackage.canonicalName}")}))
     }
 }

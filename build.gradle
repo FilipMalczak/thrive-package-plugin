@@ -11,43 +11,49 @@ buildscript {
 }
 
 plugins {
-    id 'maven-publish'
     id 'groovy'
-    id 'java-library'
     id 'java-gradle-plugin'
 }
 
 sourceSets.main.java.srcDirs = []
 sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
 
-ext {
-    lombokVersion = "1.18.2"
-    autoserviceVersion = "1.0-rc6"
-}
-
-apply plugin: "com.github.thrive-versioning"
-
 group = 'com.github.thrive-framework'
 
-repositories {
-    mavenCentral()
-    maven {
-        name "jitpack"
-        url "https://jitpack.io"
+subprojects {
+    group = "com.github.thrive-framework.thrive-package-plugin"
+}
+
+allprojects {
+    ext {
+        lombokVersion = "1.18.2"
+        autoserviceVersion = "1.0-rc6"
+    }
+
+    apply plugin: "java-library"
+    apply plugin: "maven-publish"
+    apply plugin: "com.github.thrive-versioning"
+
+    repositories {
+        mavenCentral()
+        maven {
+            name "jitpack"
+            url "https://jitpack.io"
+        }
+    }
+
+    dependencies {
+        compileOnly("org.projectlombok:lombok:${lombokVersion}")
+        annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
     }
 }
 
 dependencies {
+    implementation project(":core")
     //todo versions to ext
-    implementation 'org.yaml:snakeyaml:1.25'
     implementation "com.github.thrive-framework:thrive-plugin-common:0.1.0-SNAPSHOT"
-
-    compileOnly("org.projectlombok:lombok:${lombokVersion}")
-    annotationProcessor("org.projectlombok:lombok:${lombokVersion}")
-
-    compileOnly("com.google.auto.service:auto-service:${autoserviceVersion}")
-    annotationProcessor("com.google.auto.service:auto-service:${autoserviceVersion}")
 }
+
 
 gradlePlugin {
     plugins {

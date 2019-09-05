@@ -1,13 +1,13 @@
 package com.github.thriveframework.plugin.model;
 
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-
-import static java.util.Arrays.asList;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)

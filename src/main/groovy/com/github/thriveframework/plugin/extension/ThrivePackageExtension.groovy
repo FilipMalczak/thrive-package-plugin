@@ -14,6 +14,7 @@ class ThrivePackageExtension {
     final Property<String> group
     final Property<String> name
     final NamedDomainObjectContainer<Service> services
+    final DependencyPackages deps
 
     ThrivePackageExtension(Project project){
         name = project.objects.property(String)
@@ -21,13 +22,15 @@ class ThrivePackageExtension {
         services = project.objects.domainObjectContainer(Service)
         //todo refactor all plugins; this is the way to do nested extensions
         this.extensions.add("services", services)
+        deps = this.extensions.create("deps", DependencyPackages, project)
+
         //todo defaults can be set with "convention" https://docs.gradle.org/current/userguide/lazy_configuration.html#sec:applying_conventions
         initDefaults(project)
     }
 
     private void initDefaults(Project project){
-        setName normalizeName(project.name)
-        setGroup normalizeGroup("${project.group}")
+        name.convention(project.provider({ project.name }).map({ n -> normalizeName(n)}))
+        group.convention(project.provider({ project.group }).map({ g -> normalizeGroup("$g")}))
     }
 
     void setName(String name){

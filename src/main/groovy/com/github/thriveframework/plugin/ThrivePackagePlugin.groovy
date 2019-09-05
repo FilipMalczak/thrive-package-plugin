@@ -2,34 +2,37 @@ package com.github.thriveframework.plugin
 
 
 import com.github.thriveframework.plugin.extension.ThrivePackageExtension
+import com.github.thriveframework.plugin.extension.ThrivePackageSpec
 import com.github.thriveframework.plugin.task.CompilePackage
 import com.github.thriveframework.plugin.task.PackageJar
 import com.github.thriveframework.plugin.task.WriteDockerCompose
 import com.github.thriveframework.plugin.task.WritePackage
+import com.github.thriveframework.plugin.task.WritePackageProperties
 import com.github.thriveframework.plugin.task.WritePackageProviderConfiguration
+import com.github.thriveframework.plugin.task.WritePackageYaml
 import com.github.thriveframework.plugin.utils.Gradle
 import com.github.thriveframework.plugin.utils.PackageFiles
 
 import groovy.util.logging.Slf4j
-import org.gradle.api.GradleException
+import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.internal.JavaConfigurationVariantMapping
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.util.GradleVersion
+import org.gradle.util.ConfigureUtil
 
 import javax.inject.Inject
 
 import static com.github.thriveframework.plugin.utils.Projects.applyPlugin
 import static com.github.thriveframework.plugin.utils.Projects.createTask
-import static com.github.thriveframework.plugin.utils.Projects.fullName
 
 @Slf4j
 class ThrivePackagePlugin implements Plugin<Project> {
     private PackageFiles packageFiles
     private ThrivePackageExtension extension
+    private Closure pkgSpec
     private final static String taskGroup = "thrive (package)"
     private SoftwareComponentFactory componentFactory
 
@@ -40,16 +43,16 @@ class ThrivePackagePlugin implements Plugin<Project> {
 
     @Override
     void apply(Project target) {
-        //todo another "common" candidate
         Gradle.assertVersionAtLeast("5.5")
         prepare(target)
-        addWritePackageTask(target)
+        addPreparePackageTasks(target)
         addCompilePackageTask(target)
-        addWritePackageServiceProviderDescriptorTask(target)
         addPackageJarTask(target)
-        bindTasks(target)
         configurePublishing(target)
+        addComposeConfigurations(target)
         addComposeTask(target)
+        bindTasks(target)
+//        preconfigureForThrivePlugin() //todo
     }
 
     private void prepare(Project project){
@@ -58,6 +61,11 @@ class ThrivePackagePlugin implements Plugin<Project> {
         packageFiles.packageClasses.mkdirs()
 
         extension = project.extensions.create("thrivePackage", ThrivePackageExtension, project)
+        pkgSpec = {
+            packageGroup = extension.group
+            packageName = extension.name
+            targetDir = packageFiles.packageResources
+        }
 
         //todo maybe create source set?
 
@@ -76,10 +84,38 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.components.add(component)
     }
 
-    private void addWritePackageTask(Project project){
-        //todo extract createTask(...) method to plugin-common
+    private void addPreparePackageTasks(Project project){
+        createTask(
+            project,
+            "writePackageProperties",
+            WritePackageProperties,
+            taskGroup,
+            ""//todo
+        ) {
+            pkg pkgSpec
+        }
+
+        createTask(
+            project,
+            "writePackageYaml",
+            WritePackageYaml,
+            taskGroup,
+            ""//todo
+        ) {
+            pkg pkgSpec
+            composition = project.provider { extension.composition }
+        }
+
+        createTask(
+            project,
+            "preparePackageDir",
+            DefaultTask,
+            taskGroup,
+            "" //todo
+        ) {}
+
         project.tasks.create(
-            name: "writePackage",
+            name: "writePackageSrc",
             type: WritePackage,
             group: taskGroup,
             description: ""//todo
@@ -89,23 +125,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
             composition = project.provider { extension.composition }
             targetDir = packageFiles.packageSrc
         }
-    }
 
-    private void addCompilePackageTask(Project project){
-        def pf = packageFiles
-        project.tasks.create(
-            name: "compilePackage",
-            type: CompilePackage,
-            group: taskGroup,
-            description: "", //todo
-            constructorArgs: [project.tasks.writePackage, project.configurations.thrivePackage]
-        ) {
-            packageFilesHelper = pf
-
-        }
-    }
-
-    private void addWritePackageServiceProviderDescriptorTask(Project project){
         project.tasks.create(
             name: "writePackageServiceProviderDescriptor",
             type: WritePackageProviderConfiguration,
@@ -116,6 +136,29 @@ class ThrivePackagePlugin implements Plugin<Project> {
             packageName = extension.name
             composition = project.provider { extension.composition }
             targetDir = packageFiles.packageResources
+        }
+
+        createTask(
+            project,
+            "preparePackage",
+            DefaultTask,
+            taskGroup,
+            "" //todo
+        ) {}
+    }
+
+    private void addCompilePackageTask(Project project){
+        def pf = packageFiles
+        //todo start using util method
+        project.tasks.create(
+            name: "compilePackage",
+            type: CompilePackage,
+            group: taskGroup,
+            description: "", //todo
+            constructorArgs: [project.tasks.writePackageSrc, project.configurations.thrivePackage]
+        ) {
+            packageFilesHelper = pf
+
         }
     }
 
@@ -130,14 +173,25 @@ class ThrivePackagePlugin implements Plugin<Project> {
     }
 
     private void bindTasks(Project project){
-        project.compilePackage.dependsOn project.writePackage
+        project.preparePackageDir.dependsOn project.writePackageProperties
+        project.preparePackageDir.dependsOn project.writePackageYaml
+
+        project.preparePackage.dependsOn project.preparePackageDir
+        project.preparePackage.dependsOn project.writePackageSrc
+        project.preparePackage.dependsOn project.writePackageServiceProviderDescriptor
+
+        project.compilePackage.dependsOn project.preparePackage
         project.packageJar.dependsOn project.compilePackage
-        project.packageJar.dependsOn project.writePackageServiceProviderDescriptor
+        project.packageJar.dependsOn project.compilePackage
+
+        project.writeDockerCompose.dependsOn project.preparePackageDir
 
         project.tasks.findByName("build")?.dependsOn project.packageJar
+        project.tasks.findByName("build")?.dependsOn project.writeDockerCompose
 
         project.tasks.findByName("clean")?.doLast {
             packageFiles.root.deleteDir()
+            project.file("docker-compose.yml").delete()
         }
     }
 
@@ -151,24 +205,28 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.publishThrivePackagePublicationToMavenLocal.dependsOn project.packageJar
     }
 
+    private void addComposeConfigurations(Project project){
+        project.configurations.create("generatorExec")
+        project.configurations.create("includePackage")
+
+        project.dependencies {
+            generatorExec "com.github.thrive-framework.thrive-package-plugin:generator:0.1.0-SNAPSHOT"
+        }
+    }
+
     private void addComposeTask(Project project){
-        createTask(
-            project,
-            "writeDockerCompose",
-            WriteDockerCompose,
-            "thrive (docker)",
-            "", //todo
-            [project]
+        project.tasks.create(
+            name: "writeDockerCompose",
+            type: WriteDockerCompose,
+            group: "thrive (docker)",
+            description: "", //todo
+            constructorArgs: [project]
         ) {
-            def p = []
-            p.addAll(ServiceLoader.load(Package))
-            packages = p
-            def sProvider = {
-                def s = []
-                s.addAll(extension.services)
-                s
-            }
-            declaredServices.set(project.provider(sProvider))
+            execConfigName = "generatorExec"
+            packageConfigName = "includePackage"
+            packageDirs = [
+                project.tasks.writePackageYaml.pkg.packageDir.get().asFile.absolutePath
+            ]
             targetDir = project.projectDir
         }
     }

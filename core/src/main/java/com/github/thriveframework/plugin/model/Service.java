@@ -3,7 +3,10 @@ package com.github.thriveframework.plugin.model;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)

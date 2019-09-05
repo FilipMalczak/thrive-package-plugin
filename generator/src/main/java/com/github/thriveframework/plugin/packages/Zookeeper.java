@@ -1,14 +1,14 @@
 package com.github.thriveframework.plugin.packages;
 
-import com.github.thriveframework.plugin.Package;
+import com.github.thriveframework.plugin.ThrivePackage;
 import com.github.thriveframework.plugin.model.Composition;
 import com.github.thriveframework.plugin.model.Service;
 import com.google.auto.service.AutoService;
 
 import static java.util.Arrays.asList;
 
-@AutoService(Package.class)
-public class Zookeeper implements Package {
+@AutoService(ThrivePackage.class)
+public class Zookeeper implements ThrivePackage {
     @Override
     public String getName() {
         return "zookeeper";

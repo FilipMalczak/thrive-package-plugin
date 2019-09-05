@@ -1,15 +1,14 @@
 package com.github.thriveframework.plugin.task
 
-import com.github.thriveframework.plugin.AbstractPluginPackage
+import com.github.thriveframework.plugin.impl.PluginGeneratedPackage
+import com.github.thriveframework.plugin.impl.YamlBasedPackage
 import com.github.thriveframework.plugin.model.Composition
 import groovy.util.logging.Slf4j
-import org.gradle.api.Task
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.Provider
 import org.gradle.api.provider.ProviderFactory
-import org.gradle.api.specs.Spec
 import org.yaml.snakeyaml.Yaml
 
 import javax.inject.Inject
@@ -52,11 +51,11 @@ class WritePackage extends Echo {
             """
 package ${packageGroup.get()};
 
-import ${AbstractPluginPackage.canonicalName};
+import ${PluginGeneratedPackage.canonicalName};
 
-public class ${packageName.get()} extends ${AbstractPluginPackage.simpleName} {
+public class ${packageName.get()} extends ${PluginGeneratedPackage.simpleName} {
     public ${packageName.get()}(){
-        super("${packageGroup.get()}:${packageName.get()}", "${escaped}");
+        super(${packageName.get()}.class);
     }
 } 
 """

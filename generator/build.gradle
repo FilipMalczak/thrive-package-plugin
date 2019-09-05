@@ -1,0 +1,23 @@
+plugins {
+    id "application"
+}
+
+application {
+    mainClassName = "com.github.thriveframework.plugin.GeneratorApp"
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': application.mainClassName
+    }
+}
+
+dependencies {
+    compileOnly("com.google.auto.service:auto-service:${autoserviceVersion}")
+    annotationProcessor("com.google.auto.service:auto-service:${autoserviceVersion}")
+
+    implementation project(":core")
+    //todo version to ext
+    implementation group: 'com.beust', name: 'jcommander', version: '1.78'
+
+}
