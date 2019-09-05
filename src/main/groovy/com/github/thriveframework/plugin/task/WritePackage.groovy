@@ -3,6 +3,7 @@ package com.github.thriveframework.plugin.task
 import com.github.thriveframework.plugin.impl.PluginGeneratedPackage
 import com.github.thriveframework.plugin.impl.YamlBasedPackage
 import com.github.thriveframework.plugin.model.Composition
+import com.github.thriveframework.utils.plugin.task.Echo
 import groovy.util.logging.Slf4j
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.model.ObjectFactory

@@ -2,6 +2,7 @@ package com.github.thriveframework.plugin.task
 
 import com.github.thriveframework.plugin.extension.ThrivePackageSpec
 import com.github.thriveframework.plugin.model.Composition
+import com.github.thriveframework.utils.plugin.task.Echo
 import groovy.util.logging.Slf4j
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
