@@ -10,9 +10,8 @@ import com.github.thriveframework.plugin.task.WritePackage
 import com.github.thriveframework.plugin.task.WritePackageProperties
 import com.github.thriveframework.plugin.task.WritePackageProviderConfiguration
 import com.github.thriveframework.plugin.task.WritePackageYaml
-import com.github.thriveframework.plugin.utils.Gradle
 import com.github.thriveframework.plugin.utils.PackageFiles
-
+import com.github.thriveframework.utils.plugin.Gradle
 import groovy.util.logging.Slf4j
 import org.gradle.api.DefaultTask
 import org.gradle.api.Plugin
@@ -25,8 +24,8 @@ import org.gradle.util.ConfigureUtil
 
 import javax.inject.Inject
 
-import static com.github.thriveframework.plugin.utils.Projects.applyPlugin
-import static com.github.thriveframework.plugin.utils.Projects.createTask
+import static com.github.thriveframework.utils.plugin.Projects.applyPlugin
+import static com.github.thriveframework.utils.plugin.Projects.createTask
 
 @Slf4j
 class ThrivePackagePlugin implements Plugin<Project> {

@@ -51,7 +51,7 @@ allprojects {
 dependencies {
     implementation project(":core")
     //todo versions to ext
-    implementation "com.github.thrive-framework:thrive-plugin-common:0.1.0-SNAPSHOT"
+    implementation "com.github.thrive-framework:thrive-plugin-common:0.1.0"
 }
 
 
