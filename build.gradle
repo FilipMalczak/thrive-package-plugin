@@ -19,10 +19,10 @@ sourceSets.main.java.srcDirs = []
 sourceSets.main.groovy.srcDirs = ["src/main/java", "src/main/groovy"]
 
 group = 'com.github.thrive-framework'
-
-subprojects {
-    group = "com.github.thrive-framework.thrive-package-plugin"
-}
+//
+//subprojects {
+//    group = "com.github.thrive-framework.thrive-package-plugin"
+//}
 
 allprojects {
     ext {
