@@ -6,6 +6,7 @@ import org.gradle.api.DefaultTask
 import org.gradle.api.Project
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.provider.ListProperty
+import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.TaskAction
 
@@ -20,6 +21,7 @@ class WriteDockerCompose extends DefaultTask {
     final Property<String> execConfigName
     final Property<String> packageConfigName
     final ListProperty<String> packageDirs
+    final MapProperty<String, List<String>> profiles
     //todo support for package dirs
     final DirectoryProperty targetDir
 
@@ -28,6 +30,7 @@ class WriteDockerCompose extends DefaultTask {
         execConfigName = project.objects.property(String)
         packageConfigName = project.objects.property(String)
         packageDirs = project.objects.listProperty(String)
+        profiles = project.objects.mapProperty(String, List)
         targetDir = project.objects.directoryProperty()
     }
 
@@ -38,7 +41,10 @@ class WriteDockerCompose extends DefaultTask {
             it.absolutePath
         }).join(":")
         def main = MAIN_NAME
-        def args = (packageDirs.get() + ["-w", "${targetDir.asFile.get().absolutePath}"]).join(" ")
+        def pkgDirs = packageDirs.get()
+        def profilesSpec = profiles.get().collect { k, v -> [ "-p", "${k}:${v.join("+")}" ]}.flatten()
+        def workspace = ["-w", "${targetDir.asFile.get().absolutePath}"]
+        def args = (pkgDirs + profilesSpec + workspace).join(" ")
         def command = "${javaExe} -cp ${classpath} $main $args"
         def process = command.execute()
         def t1 = process.consumeProcessOutputStream(System.out)

@@ -102,7 +102,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
             ""//todo
         ) {
             pkg pkgSpec
-            composition = project.provider { extension.composition }
+            composition = project.provider { extension.layout.toComposition() }
         }
 
         createTask(
@@ -121,7 +121,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         ) {
             packageGroup = extension.group
             packageName = extension.name
-            composition = project.provider { extension.composition }
+            composition = project.provider { extension.layout.toComposition() }
             targetDir = packageFiles.packageSrc
         }
 
@@ -133,7 +133,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         ) {
             packageGroup = extension.group
             packageName = extension.name
-            composition = project.provider { extension.composition }
+            composition = project.provider { extension.layout.toComposition() }
             targetDir = packageFiles.packageResources
         }
 
@@ -209,6 +209,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         project.configurations.create("includePackage")
 
         project.dependencies {
+            //todo version should move automatically
             generatorExec "com.github.thrive-framework.thrive-package-plugin:generator:0.1.0-SNAPSHOT"
         }
     }
@@ -226,7 +227,8 @@ class ThrivePackagePlugin implements Plugin<Project> {
             packageDirs = [
                 project.tasks.writePackageYaml.pkg.packageDir.get().asFile.absolutePath
             ]
-            targetDir = project.projectDir
+            profiles = extension.layout.profiles
+            targetDir = packageFiles.composeYamls
         }
     }
 }

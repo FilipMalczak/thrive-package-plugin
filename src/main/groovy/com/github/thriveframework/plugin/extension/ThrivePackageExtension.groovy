@@ -9,22 +9,20 @@ import org.gradle.api.provider.Property
 import com.github.thriveframework.plugin.model.Service
 import org.gradle.api.provider.Provider
 
+import static com.github.thriveframework.utils.plugin.Projects.fullName
+
 @Slf4j
 class ThrivePackageExtension {
     final Property<String> group
     final Property<String> name
-    final NamedDomainObjectContainer<Service> services
+    final ServiceLayoutExtension layout
     final DependencyPackages deps
 
     ThrivePackageExtension(Project project){
         name = project.objects.property(String)
         group = project.objects.property(String)
-        services = project.objects.domainObjectContainer(Service)
-        //todo refactor all plugins; this is the way to do nested extensions
-        this.extensions.add("services", services)
+        layout = this.extensions.create("layout", ServiceLayoutExtension, project)
         deps = this.extensions.create("deps", DependencyPackages, project)
-
-        //todo defaults can be set with "convention" https://docs.gradle.org/current/userguide/lazy_configuration.html#sec:applying_conventions
         initDefaults(project)
     }
 
@@ -42,7 +40,7 @@ class ThrivePackageExtension {
     }
 
     Composition getComposition(){
-        return new Composition(new ArrayList<Service>(services))
+        return new Composition(new ArrayList<Service>(services), new HashMap<String, List<Service>>())
     }
 
     //fixme should be private
