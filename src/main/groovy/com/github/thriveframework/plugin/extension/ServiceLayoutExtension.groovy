@@ -33,15 +33,15 @@ class ServiceLayoutExtension {
 
     Composition toComposition(){
         Map<String, Map<String, Service>> facetToService = [:].withDefault {[:]}
-        facetToService["_"][main.name] = new Service(main)
+        facetToService["_"][main.name] = main.asService()
         for (Service service: services)
-            facetToService["_"][service.name] = new Service(service)
+            facetToService["_"][service.name] = service.asService()
         for (Service mainFacet: main.facets){
-            facetToService[mainFacet.name][main.name] = new Service(main.name, mainFacet)
+            facetToService[mainFacet.name][main.name] = mainFacet.asService(main.name)
         }
         for (ServiceWithFacetsExtension service: services)
             for (Service facet: service.facets)
-                facetToService[facet.name][service.name] = new Service(service.name, facet)
+                facetToService[facet.name][service.name] = facet.asService(service.name)
         def builder = Composition.builder()
         for (String facet: facetToService.keySet()) {
             Set<Service> facetContent = facetToService[facet].values()

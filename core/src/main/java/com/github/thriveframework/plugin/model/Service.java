@@ -29,6 +29,7 @@ public class Service {
     Set<String> runtimeDependencies = new HashSet<>();
     String command;
 
+    //todo comment out of date; ctor can be useless, we have copy-with-new-name one
     //required so that Gradle can create named domain objects (see ThrivePackageExtension)
     public Service(String name){
         this(name,
@@ -58,37 +59,5 @@ public class Service {
     public Service(String name, Service example){
         this(example);
         this.name = name;
-    }
-
-    public void setImage(String image){
-        this.definition = ImageDefinition.image(image);
-    }
-
-    public void setBuild(String path){
-        this.definition = ImageDefinition.build(path);
-    }
-
-    //todo String-based overloads
-    public void port(int external, int internal){
-        ports.add(Port.between(external, internal));
-    }
-
-    public void port(int p){
-        ports.add(Port.exposed(p));
-    }
-
-    //todo fluent, type-agnostic ports(Object... p)
-
-    //todo maybe something shorter? startup=require, runtime=use?
-    public void startupDependency(String dep){
-        startupDependencies.add(dep);
-    }
-
-    public void runtimeDependency(String dep){
-        runtimeDependencies.add(dep);
-    }
-
-    public void env(Map<String, String> val){
-        environment.putAll(val);
     }
 }

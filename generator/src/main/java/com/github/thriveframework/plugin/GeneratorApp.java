@@ -60,7 +60,7 @@ public class GeneratorApp {
                     String[] singleFacets = joinedFacets.split("[+]");
                     profileToFacets.put(name, Stream.of(singleFacets).filter(s -> !s.isEmpty()).collect(toList()));
                 } else {
-                    throw new IllegalArgumentException("Profiles has to of form <name>:facet1,facet2! Gotten '"+profile+"' instead!");
+                    throw new IllegalArgumentException("Profiles has to come in format 'profileName:facet1(+facet2)*'! Gotten '"+profile+"' instead!");
                 }
             }
             System.out.println("Found following profile config: "+profileToFacets);
