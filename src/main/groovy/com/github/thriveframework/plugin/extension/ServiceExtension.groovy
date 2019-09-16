@@ -21,7 +21,7 @@ class ServiceExtension {
     final Property<String> command
 
     @Inject
-    ServiceExtension(ObjectFactory objects, String nameVal=null){
+    ServiceExtension(String nameVal=null, ObjectFactory objects){
         name = objects.property(String)
         if (nameVal)
             name.set(nameVal)

@@ -1,9 +1,6 @@
 package com.github.thriveframework.plugin.model;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 @Data
@@ -11,8 +8,8 @@ import lombok.experimental.FieldDefaults;
 @AllArgsConstructor
 @NoArgsConstructor
 public final class ImageDefinition {
-    String composeKey;
-    String imageSpec;
+    @NonNull String composeKey;
+    @NonNull String imageSpec;
 
     public static ImageDefinition build(String path){
         return new ImageDefinition("build", path);

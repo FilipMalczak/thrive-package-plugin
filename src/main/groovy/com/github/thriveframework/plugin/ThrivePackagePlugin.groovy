@@ -239,10 +239,10 @@ class ThrivePackagePlugin implements Plugin<Project> {
             if (thriveExt.isRunnableProject.get()) {
                 def img = project.provider { thriveExt.dockerImage }
                 //todo this can be done in some fancy convention-related fashion
-                extension.layout.main.name.convention img.flatMap { i ->
+                extension.layout.core.main.name.convention img.flatMap { i ->
                     i.name
                 }
-                extension.layout.main.definition.convention img.flatMap { i ->
+                extension.layout.core.main.definition.convention img.flatMap { i ->
                     i.imageName.map {
                         ImageDefinition.image(it)
                     }

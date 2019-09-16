@@ -60,4 +60,15 @@ public class Service {
         this(example);
         this.name = name;
     }
+
+    /**
+     * Is any field of this service non-null and not empty? Name is ignored.
+     */
+    public boolean empty(){
+        return definition == null &&
+            (environment == null || environment.isEmpty()) &&
+            (startupDependencies == null || startupDependencies.isEmpty()) &&
+            (runtimeDependencies == null || runtimeDependencies.isEmpty()) &&
+            (command == null || command.isEmpty());
+    }
 }

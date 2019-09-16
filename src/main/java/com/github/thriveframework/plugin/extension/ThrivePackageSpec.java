@@ -16,12 +16,12 @@ import javax.inject.Inject;
 
 @ToString
 @EqualsAndHashCode
-@FieldDefaults(level = AccessLevel.PRIVATE)
+@FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Getter
 public class ThrivePackageSpec {
-    final Property<String> packageName;
-    final Property<String> packageGroup;
-    final DirectoryProperty targetDir;
+    Property<String> packageName;
+    Property<String> packageGroup;
+    DirectoryProperty targetDir;
 
     @Inject
     public ThrivePackageSpec(ObjectFactory objects){
