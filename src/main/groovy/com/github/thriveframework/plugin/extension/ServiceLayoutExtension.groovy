@@ -8,6 +8,7 @@ import org.gradle.api.provider.MapProperty
 
 import javax.inject.Inject
 
+
 class ServiceLayoutExtension {
     final FacetExtension core
     final Map<String, FacetExtension> facets
@@ -19,6 +20,7 @@ class ServiceLayoutExtension {
         core = this.extensions.create("core", FacetExtension)
         facets = [:]
         profiles = project.objects.mapProperty(String, List)
+        this.extensions.add("profiles", profiles)
         initDefaults(project)
     }
 
