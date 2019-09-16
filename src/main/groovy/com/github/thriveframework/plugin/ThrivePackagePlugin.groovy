@@ -191,7 +191,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
 
         project.tasks.findByName("clean")?.doLast {
             packageFiles.root.deleteDir()
-            project.file("docker-compose.yml").delete()
+            packageFiles.composeWorkspace.deleteDir()
         }
     }
 
