@@ -3,13 +3,13 @@ package com.github.thriveframework.plugin.extension
 import com.github.thriveframework.plugin.model.ImageDefinition
 import com.github.thriveframework.plugin.model.Port
 import com.github.thriveframework.plugin.model.Service
+import groovy.transform.ToString
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.provider.SetProperty
 
 import javax.inject.Inject
-
 
 class ServiceExtension {
     final Property<String> name
@@ -85,7 +85,21 @@ class ServiceExtension {
 
     Service asService(String name){
         def out = asService()
-        out.name = name
+        out.name.set name
         out
+    }
+
+
+    @Override
+    public String toString() {
+        return "ServiceExtension{" +
+            "name=" + name.getOrNull() +
+            ", definition=" + definition.getOrNull() +
+            ", environment=" + environment.getOrNull() +
+            ", ports=" + ports.getOrNull() +
+            ", startupDependencies=" + startupDependencies.getOrNull() +
+            ", runtimeDependencies=" + runtimeDependencies.getOrNull() +
+            ", command=" + command.getOrNull() +
+            '}';
     }
 }

@@ -1,6 +1,7 @@
 package com.github.thriveframework.plugin.extension
 
 import com.github.thriveframework.plugin.model.Composition
+import groovy.transform.ToString
 import groovy.util.logging.Slf4j
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
@@ -16,13 +17,11 @@ class ThrivePackageExtension {
     final Property<String> group
     final Property<String> name
     final ServiceLayoutExtension layout
-    final DependencyPackages deps
 
     ThrivePackageExtension(Project project){
         name = project.objects.property(String)
         group = project.objects.property(String)
         layout = this.extensions.create("layout", ServiceLayoutExtension, project)
-        deps = this.extensions.create("deps", DependencyPackages, project)
         initDefaults(project)
     }
 
@@ -55,5 +54,15 @@ class ThrivePackageExtension {
 
     String normalizeName(String n){
         n.split("-").collect { it.capitalize() }.join("")
+    }
+
+
+    @Override
+    public String toString() {
+        return "ThrivePackageExtension{" +
+            "group=" + group.getOrNull() +
+            ", name=" + name.getOrNull() +
+            ", layout=" + layout.getOrNull() +
+            '}';
     }
 }

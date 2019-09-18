@@ -1,5 +1,6 @@
 package com.github.thriveframework.plugin.extension
 
+import groovy.transform.ToString
 import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
@@ -29,5 +30,16 @@ class FacetExtension {
         // this implementation makes it possible to configure main service via name in services closure
         // seems like a beature (a bug and a feature at once)
         return ( hasMainService.get() ? [mainService] : [] )+ (services as List)
+    }
+
+
+    @Override
+    public String toString() {
+        return "FacetExtension{" +
+            "name=" + name.getOrNull() +
+            ", hasMainService=" + hasMainService.getOrNull() +
+            ", mainService=" + mainService +
+            ", services=" + (services as List) +
+            '}';
     }
 }

@@ -67,6 +67,7 @@ public class Service {
     public boolean empty(){
         return definition == null &&
             (environment == null || environment.isEmpty()) &&
+            (ports == null || ports.isEmpty()) &&
             (startupDependencies == null || startupDependencies.isEmpty()) &&
             (runtimeDependencies == null || runtimeDependencies.isEmpty()) &&
             (command == null || command.isEmpty());

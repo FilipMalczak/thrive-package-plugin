@@ -1,11 +1,11 @@
 package com.github.thriveframework.plugin.extension
 
 import com.github.thriveframework.plugin.model.Composition
+import groovy.transform.ToString
 import org.gradle.api.Project
 import org.gradle.api.provider.MapProperty
 
 import javax.inject.Inject
-
 
 class ServiceLayoutExtension {
     final FacetExtension core
@@ -33,11 +33,13 @@ class ServiceLayoutExtension {
     Composition toComposition(){
         def builder = Composition.builder()
         //todo add service merging with configurable strategies
-        builder.services(core.allServices().collect { it.asService() }.findAll { !it.empty() }.unique())
+        builder.services(core.allServices().collect { it.asService() }.findAll { !it.empty() })
         facets.each { n, f ->
+            println "FACET $n"
+            println "$f"
             builder.facet(
                 n,
-                f.allServices().collect { it.asService() }.findAll { !it.empty() }.unique()
+                f.allServices().collect { it.asService() }.findAll { !it.empty() }
             )
         }
         builder.build()
@@ -50,5 +52,15 @@ class ServiceLayoutExtension {
             f.mainService.name.set(core.mainService.name)
         }
         this."$name"(config)
+    }
+
+
+    @Override
+    public String toString() {
+        return "ServiceLayoutExtension{" +
+            "core=" + core.getOrNull() +
+            ", facets=" + facets +
+            ", profiles=" + profiles.getOrNull() +
+            '}';
     }
 }
