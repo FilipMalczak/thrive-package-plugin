@@ -8,21 +8,26 @@ import javax.inject.Inject
 
 class FacetExtension {
     final Property<String> name
-    final ServiceExtension main;
+    final Property<Boolean> hasMainService
+    final ServiceExtension mainService;
     final NamedDomainObjectContainer<ServiceExtension> services;
 
     @Inject
     FacetExtension(String nameVal=null, ObjectFactory objects){
         name = objects.property(String)
-        main = this.extensions.create("main", ServiceExtension)
+        hasMainService = objects.property(Boolean)
+        mainService = this.extensions.create("mainService", ServiceExtension)
         services = objects.domainObjectContainer(ServiceExtension)
         this.extensions.add("services", services)
+        hasMainService.convention true
         if (nameVal)
             this.name.set(nameVal)
     }
 
 
     List<ServiceExtension> allServices(){
-        return [main] + (services as List)
+        // this implementation makes it possible to configure main service via name in services closure
+        // seems like a beature (a bug and a feature at once)
+        return ( hasMainService.get() ? [mainService] : [] )+ (services as List)
     }
 }

@@ -1,8 +1,6 @@
 package com.github.thriveframework.plugin.extension
 
 import com.github.thriveframework.plugin.model.Composition
-import com.github.thriveframework.plugin.model.Service
-import org.gradle.api.NamedDomainObjectContainer
 import org.gradle.api.Project
 import org.gradle.api.provider.MapProperty
 
@@ -34,11 +32,12 @@ class ServiceLayoutExtension {
 
     Composition toComposition(){
         def builder = Composition.builder()
-        builder.services(core.allServices().collect { it.asService() }.findAll { !it.empty() })
+        //todo add service merging with configurable strategies
+        builder.services(core.allServices().collect { it.asService() }.findAll { !it.empty() }.unique())
         facets.each { n, f ->
             builder.facet(
                 n,
-                f.allServices().collect { it.asService() }.findAll { !it.empty() }
+                f.allServices().collect { it.asService() }.findAll { !it.empty() }.unique()
             )
         }
         builder.build()
@@ -48,7 +47,7 @@ class ServiceLayoutExtension {
         if (!this.extensions.findByName(name)) {
             FacetExtension f = this.extensions.create(name, FacetExtension)
             facets[name] = f
-            f.main.name.set(core.main.name)
+            f.mainService.name.set(core.mainService.name)
         }
         this."$name"(config)
     }

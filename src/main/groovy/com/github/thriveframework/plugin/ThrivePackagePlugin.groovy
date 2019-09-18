@@ -2,7 +2,6 @@ package com.github.thriveframework.plugin
 
 
 import com.github.thriveframework.plugin.extension.ThrivePackageExtension
-import com.github.thriveframework.plugin.extension.ThrivePackageSpec
 import com.github.thriveframework.plugin.model.ImageDefinition
 import com.github.thriveframework.plugin.task.CompilePackage
 import com.github.thriveframework.plugin.task.PackageJar
@@ -21,7 +20,6 @@ import org.gradle.api.component.AdhocComponentWithVariants
 import org.gradle.api.component.SoftwareComponentFactory
 import org.gradle.api.plugins.internal.JavaConfigurationVariantMapping
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.util.ConfigureUtil
 
 import javax.inject.Inject
 
@@ -239,10 +237,10 @@ class ThrivePackagePlugin implements Plugin<Project> {
             if (thriveExt.isRunnableProject.get()) {
                 def img = project.provider { thriveExt.dockerImage }
                 //todo this can be done in some fancy convention-related fashion
-                extension.layout.core.main.name.convention img.flatMap { i ->
+                extension.layout.core.mainService.name.convention img.flatMap { i ->
                     i.name
                 }
-                extension.layout.core.main.definition.convention img.flatMap { i ->
+                extension.layout.core.mainService.definition.convention img.flatMap { i ->
                     i.imageName.map {
                         ImageDefinition.image(it)
                     }
