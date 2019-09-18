@@ -11,6 +11,7 @@ class PackageJar extends Jar {
         from(packageFiles.packageClasses, packageFiles.packageResources)
         destinationDirectory.set packageFiles.packageLibs
         include "**/*.class"
+        include "thrivepackage/**/*.*"
         include "META-INF/services/*"
         archiveBaseName.set "${projectName}-package"
     }

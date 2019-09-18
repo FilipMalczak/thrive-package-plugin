@@ -37,7 +37,10 @@ class WriteDockerCompose extends DefaultTask {
     @TaskAction
     void run(){
         def javaExe = "${System.getProperty("java.home")}/bin/java"
-        def classpath = project.configurations.findByName(execConfigName.get()).resolve().collect({
+        def classpath = (
+            project.configurations.findByName(execConfigName.get()).resolve()+
+            project.configurations.findByName(packageConfigName.get()).resolve()
+        ).collect({
             it.absolutePath
         }).join(":")
         def main = MAIN_NAME

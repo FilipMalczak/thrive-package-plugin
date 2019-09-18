@@ -17,7 +17,7 @@ public class PluginGeneratedPackage extends YamlBasedPackage {
     @SneakyThrows
     private static String retrieveName(Class clazz){
         Properties props = new Properties();
-        try (InputStream s = clazz.getClassLoader().getResourceAsStream("/thrivepackage/"+clazz.getCanonicalName()+"/pkg.properties")){
+        try (InputStream s = clazz.getClassLoader().getResourceAsStream("thrivepackage/"+clazz.getCanonicalName()+"/pkg.properties")){
             props.load(s);
         }
         String name = props.getProperty("name");
@@ -28,7 +28,7 @@ public class PluginGeneratedPackage extends YamlBasedPackage {
     @SneakyThrows
     private static String retrieveYaml(Class clazz){
         try (
-            InputStream s = clazz.getClassLoader().getResourceAsStream("/thrivepackage/"+clazz.getCanonicalName()+"/pkg.yaml");
+            InputStream s = clazz.getClassLoader().getResourceAsStream("thrivepackage/"+clazz.getCanonicalName()+"/pkg.yaml");
             InputStreamReader isr = new InputStreamReader(s);
             BufferedReader reader = new BufferedReader(isr)
         ){
