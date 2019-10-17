@@ -3,7 +3,6 @@ package com.github.thriveframework.plugin.extension
 import com.github.thriveframework.plugin.model.ImageDefinition
 import com.github.thriveframework.plugin.model.Port
 import com.github.thriveframework.plugin.model.Service
-import groovy.transform.ToString
 import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.MapProperty
 import org.gradle.api.provider.Property
@@ -16,6 +15,7 @@ class ServiceExtension {
     final Property<ImageDefinition> definition
     final MapProperty<String, String> environment
     final SetProperty<Port> ports
+    final SetProperty<Integer> exposed
     final SetProperty<String> startupDependencies
     final SetProperty<String> runtimeDependencies
     final Property<String> command
@@ -28,6 +28,7 @@ class ServiceExtension {
         definition = objects.property(ImageDefinition)
         environment = objects.mapProperty(String, String)
         ports = objects.setProperty(Port)
+        exposed = objects.setProperty(Integer)
         startupDependencies = objects.setProperty(String)
         runtimeDependencies = objects.setProperty(String)
         command = objects.property(String)
@@ -48,12 +49,20 @@ class ServiceExtension {
     }
 
     //todo String-based overloads
-    void port(int external, int internal){
+    void port(int external, int internal, boolean exposed=true){
         ports.add(Port.between(external, internal))
+        if (exposed)
+            expose(internal)
     }
 
-    void port(int p){
-        ports.add(Port.exposed(p))
+    void port(int p, boolean exposed=true){
+        ports.add(Port.just(p))
+        if (exposed)
+            expose(p)
+    }
+
+    void expose(int port){
+        exposed.add(port)
     }
 
     //todo fluent, type-agnostic ports(Object... p)
@@ -77,6 +86,7 @@ class ServiceExtension {
             definition.getOrElse(null),
             environment.getOrElse([:]),
             ports.getOrElse([] as Set),
+            exposed.getOrElse([] as Set),
             startupDependencies.getOrElse([] as Set),
             runtimeDependencies.getOrElse([] as Set),
             command.getOrElse(null)
@@ -97,6 +107,7 @@ class ServiceExtension {
             ", definition=" + definition.getOrNull() +
             ", environment=" + environment.getOrNull() +
             ", ports=" + ports.getOrNull() +
+            ", exposed=" + exposed.getOrNull() +
             ", startupDependencies=" + startupDependencies.getOrNull() +
             ", runtimeDependencies=" + runtimeDependencies.getOrNull() +
             ", command=" + command.getOrNull() +

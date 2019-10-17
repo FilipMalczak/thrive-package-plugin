@@ -29,6 +29,7 @@ public class Kafka implements ThrivePackage {
                     .env("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "INTERNAL:PLAINTEXT")
                     .env("KAFKA_INTER_BROKER_LISTENER_NAME", "INTERNAL")
                     .env("KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR", "1")
+                    .expose(9092)
                     //todo or maybe runtime?
                     .startupDependency("zookeeper")
                     .build()
@@ -40,7 +41,8 @@ public class Kafka implements ThrivePackage {
                         .name("kafka")
                         .env("KAFKA_ADVERTISED_LISTENERS", "INTERNAL://kafka:9092,EXTERNAL://localhost:29092")
                         .env("KAFKA_LISTENER_SECURITY_PROTOCOL_MAP", "INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT")
-                        .port(Port.exposed(29092))
+                        .port(Port.just(29092))
+                        .expose(29092)
                         .build()
                 )
             )

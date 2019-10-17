@@ -51,6 +51,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
         addComposeTask(target)
         bindTasks(target)
         preconfigureForThrivePlugin(target) //todo
+        handleCoreDependencies(target)
     }
 
     private void prepare(Project project){
@@ -214,7 +215,7 @@ class ThrivePackagePlugin implements Plugin<Project> {
     }
 
     private void addComposeTask(Project project){
-        project.tasks.create(
+        WriteDockerCompose t = project.tasks.create(
             name: "writeDockerCompose",
             type: WriteDockerCompose,
             group: "thrive (docker)",
@@ -225,9 +226,14 @@ class ThrivePackagePlugin implements Plugin<Project> {
             packageConfigName = "includePackage"
             packageDirs = [
                 project.tasks.writePackageYaml.pkg.packageDir.get().asFile.absolutePath
-            ]
+            ] + extension.packageDirs
             profiles = extension.layout.profiles
             targetDir = packageFiles.composeYamls
+        }
+        t.mainServiceName.set extension.layout.core.hasMainService.map {has ->
+            has ?
+                extension.layout.core.mainService.name.get() :
+                null
         }
     }
 
@@ -246,6 +252,17 @@ class ThrivePackagePlugin implements Plugin<Project> {
                     }
                 }
             }
+        }
+    }
+
+    private void handleCoreDependencies(Project project){
+        project.afterEvaluate {
+            if (extension.dependsOnCoreServices.get())
+                project.dependencies {
+                    includePackage "com.github.thrive-framework:thrive-gateway-package:0.3.0-SNAPSHOT"
+                    includePackage "com.github.thrive-framework:thrive-docs-package:0.3.0-SNAPSHOT"
+                    includePackage "com.github.thrive-framework:thrive-admin-package:0.3.0-SNAPSHOT"
+                }
         }
     }
 }

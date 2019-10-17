@@ -19,7 +19,7 @@ public class Port {
         return new Port(external, internal);
     }
 
-    public static Port exposed(int justExposed){
+    public static Port just(int justExposed){
         return between(justExposed, justExposed);
     }
 }

@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -23,6 +22,8 @@ public class Service {
     Map<String, String> environment = new HashMap<>();
     @Singular
     Set<Port> ports = new HashSet<>();
+    @Singular("expose")
+    Set<Integer> exposed = new HashSet<>();
     @Singular("startupDependency")
     Set<String> startupDependencies = new HashSet<>();
     @Singular("runtimeDependency")
@@ -38,6 +39,7 @@ public class Service {
             new HashSet<>(),
             new HashSet<>(),
             new HashSet<>(),
+            new HashSet<>(),
             null
         );
     }
@@ -49,7 +51,8 @@ public class Service {
                 new ImageDefinition(example.definition.getComposeKey(), example.definition.getImageSpec()) :
                 null,
             new HashMap<>(example.environment),
-            example.ports.stream().map( p -> Port.between(p.getExternal(), p.getInternal()) ).collect(toSet()),
+            example.ports.stream().map(p -> Port.between(p.getExternal(), p.getInternal()) ).collect(toSet()),
+            new HashSet<>(example.exposed),
             new HashSet<>(example.startupDependencies),
             new HashSet<>(example.runtimeDependencies),
             example.command
@@ -59,6 +62,24 @@ public class Service {
     public Service(String name, Service example){
         this(example);
         this.name = name;
+    }
+
+    public Service overwrittenBy(Service other){
+        Service out = new Service(this);
+        if (other.name != null){
+            out.name = other.name;
+        }
+        if (other.definition != null){
+            out.definition = other.definition;
+        }
+        out.environment.putAll(other.environment);
+        out.ports.addAll(other.ports); //todo assert ports.out is unique
+        out.exposed.addAll(other.exposed); //todo assert ports.out is unique
+        out.startupDependencies.addAll(other.startupDependencies);
+        out.runtimeDependencies.addAll(other.runtimeDependencies);
+        if (other.command != null)
+            out.command = other.command;
+        return out;
     }
 
     /**

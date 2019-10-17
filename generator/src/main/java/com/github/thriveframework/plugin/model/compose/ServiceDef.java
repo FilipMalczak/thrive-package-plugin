@@ -11,11 +11,11 @@ import java.util.Map;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ServiceDef {
     ImageDefinition imageDefinition;
+    @Singular("env")
     Map<String, String> environment;
     @Singular
     List<String> ports;
     List<String> depends_on;
     List<String> links;
     String command;
-    //todo add command
 }

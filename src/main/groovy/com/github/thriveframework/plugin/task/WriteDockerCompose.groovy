@@ -12,12 +12,14 @@ import org.gradle.api.tasks.TaskAction
 
 import javax.inject.Inject
 
+//fixme this name is not valid anymore, it prepares the whole "run" dir, not only configs
 //todo caching
 @Slf4j
 class WriteDockerCompose extends DefaultTask {
 
     final static String MAIN_NAME = "com.github.thriveframework.plugin.GeneratorApp"
 
+    final Property<String> mainServiceName
     final Property<String> execConfigName
     final Property<String> packageConfigName
     final ListProperty<String> packageDirs
@@ -27,6 +29,7 @@ class WriteDockerCompose extends DefaultTask {
 
     @Inject
     WriteDockerCompose(Project project) {
+        mainServiceName = project.objects.property(String)
         execConfigName = project.objects.property(String)
         packageConfigName = project.objects.property(String)
         packageDirs = project.objects.listProperty(String)
@@ -47,7 +50,9 @@ class WriteDockerCompose extends DefaultTask {
         def pkgDirs = packageDirs.get()
         def profilesSpec = profiles.get().collect { k, v -> [ "-p", "${k}:${v.join("+")}" ]}.flatten()
         def workspace = ["-w", "${targetDir.asFile.get().absolutePath}"]
-        def args = (pkgDirs + profilesSpec + workspace).join(" ")
+        def name = ["-n", project.name]//todo seems like a sane default, but give it more thought
+        def mainService = mainServiceName.isPresent() ? ["-m", mainServiceName.get()] : []
+        def args = (pkgDirs + profilesSpec + workspace + name + mainService).join(" ")
         def command = "${javaExe} -cp ${classpath} $main $args"
         def process = command.execute()
         def t1 = process.consumeProcessOutputStream(System.out)

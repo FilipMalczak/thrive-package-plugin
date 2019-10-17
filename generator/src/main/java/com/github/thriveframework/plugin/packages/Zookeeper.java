@@ -6,7 +6,6 @@ import com.github.thriveframework.plugin.model.Service;
 import com.google.auto.service.AutoService;
 
 import static com.github.thriveframework.plugin.model.ImageDefinition.image;
-import static java.util.Arrays.asList;
 
 @AutoService(ThrivePackage.class)
 public class Zookeeper implements ThrivePackage {
@@ -26,6 +25,7 @@ public class Zookeeper implements ThrivePackage {
                     //use values as such in their own config
                     .env("ZOOKEEPER_CLIENT_PORT", "2181")
                     .env("ZOOKEEPER_TICK_TIME", "2000")
+                    .expose(2181)
                     .build()
             )
             .build();

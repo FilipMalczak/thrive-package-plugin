@@ -4,6 +4,7 @@ import com.github.thriveframework.plugin.model.Composition
 import groovy.transform.ToString
 import org.gradle.api.Project
 import org.gradle.api.provider.MapProperty
+import org.gradle.api.provider.Property
 
 import javax.inject.Inject
 
@@ -12,12 +13,14 @@ class ServiceLayoutExtension {
     final Map<String, FacetExtension> facets
     //todo should be elsewhere in the API
     final MapProperty<String, List<String>> profiles
+    final Property<Boolean> mainDependsOnCore;
 
     @Inject
     ServiceLayoutExtension(Project project){
         core = this.extensions.create("core", FacetExtension)
         facets = [:]
         profiles = project.objects.mapProperty(String, List)
+        mainDependsOnCore = project.objects.property(Boolean)
         this.extensions.add("profiles", profiles)
         initDefaults(project)
     }
@@ -27,7 +30,14 @@ class ServiceLayoutExtension {
             core: [],
             local: ["local", "ui"]
         )
+        mainDependsOnCore.convention(true)
         //todo ?
+
+        project.afterEvaluate {
+            if (mainDependsOnCore.get()){
+                core.mainService.startupDependencies.addAll("kafka", "zookeeper")
+            }
+        }
     }
 
     Composition toComposition(){
@@ -35,8 +45,6 @@ class ServiceLayoutExtension {
         //todo add service merging with configurable strategies
         builder.services(core.allServices().collect { it.asService() }.findAll { !it.empty() })
         facets.each { n, f ->
-            println "FACET $n"
-            println "$f"
             builder.facet(
                 n,
                 f.allServices().collect { it.asService() }.findAll { !it.empty() }
