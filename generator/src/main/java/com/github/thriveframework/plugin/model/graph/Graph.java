@@ -63,7 +63,7 @@ public class Graph {
      * on their old connections.
      */
     public List<Node> pop(Predicate<Node> predicate){
-        List<Node> out = find(predicate).peek(x -> System.out.println("Peek "+x)).map(n -> n.copy()).collect(toList());
+        List<Node> out = find(predicate).map(n -> n.copy()).collect(toList());
         out.forEach(this::remove);
         return out;
     }
